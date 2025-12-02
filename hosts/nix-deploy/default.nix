@@ -1,5 +1,9 @@
-{ config, pkgs, ... }:
-
+{
+  config,
+  pkgs,
+  modulesPath,
+  ...
+}:
 {
   system.stateVersion = "25.11";
   nix.settings.experimental-features = [
@@ -8,36 +12,30 @@
   ];
 
   imports = [
-    ./hardware-configuration.nix
+    (modulesPath + "/profiles/qemu-guest.nix")
+    ./disko.nix
   ];
 
   boot.loader.grub.enable = true;
-  boot.loader.grub.device = "/dev/sda";
-  boot.loader.grub.useOSProber = true;
+  boot.kernelParams = [ "console=ttyS0,115200n8" ];
 
   networking.hostName = "nix-deploy";
 
-  # networking.networkmanager.enable = true;
-
   users.users.dev = {
     isNormalUser = true;
-    description = "dev";
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-    ];
+    initialPassword = "dev";
+    extraGroups = [ "wheel" ];
     packages = with pkgs; [ ];
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILoGbJn//BJtnXEeNQ9mmHZ8KXcJKmB73VGsQ6PR+M7r"
     ];
   };
 
-  nixpkgs.config.allowUnfree = true;
-
   environment.systemPackages = with pkgs; [
-    vim
-    wget
     git
+    htop
+    btop
+    gdu
   ];
 
   environment.shellAliases = {

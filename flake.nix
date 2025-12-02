@@ -25,7 +25,10 @@
 
       nixosConfigurations.nix-deploy = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        modules = [ ./hosts/nix-deploy ];
+        modules = [
+          disko.nixosModules.disko
+          ./hosts/nix-deploy
+        ];
       };
 
       nixosConfigurations.dokploy = nixpkgs.lib.nixosSystem {
