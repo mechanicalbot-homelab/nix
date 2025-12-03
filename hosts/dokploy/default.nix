@@ -18,7 +18,7 @@
 
   boot.loader.grub.enable = true;
   boot.kernelParams = [ "console=ttyS0,115200n8" ];
-  virtualisation.qemu.guestAgent.enable = true;
+  services.qemuGuest.enable = true;
 
   networking.hostName = "dokploy";
 
