@@ -28,14 +28,6 @@
     {
       formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt-tree;
 
-      nixosConfigurations.nix-deploy = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          disko.nixosModules.disko
-          ./hosts/nix-deploy
-        ];
-      };
-
       nixosConfigurations.dokploy = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
@@ -52,14 +44,36 @@
         ];
       };
 
-      deploy.nodes.dokploy = {
-        hostname = "192.168.1.70";
-        sshUser = "dev";
-        user = "root";
-        interactiveSudo = true;
-        profiles.system = {
-          path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.dokploy;
+      deploy =
+        let
+          system = "x86_64-linux";
+          pkgs = import nixpkgs { inherit system; };
+          deployPkgs = import nixpkgs {
+            inherit system;
+            overlays = [
+              deploy-rs.overlays.default
+              (self: super: {
+                deploy-rs = {
+                  inherit (pkgs) deploy-rs;
+                  lib = super.deploy-rs.lib;
+                };
+              })
+            ];
+          };
+        in
+        {
+          interactiveSudo = true;
+          remoteBuild = true;
+          nodes = {
+            dokploy = {
+              hostname = "192.168.1.21";
+              sshUser = "dev";
+              profiles.system = {
+                user = "root";
+                path = deployPkgs.deploy-rs.lib.activate.nixos self.nixosConfigurations.dokploy;
+              };
+            };
+          };
         };
-      };
     };
 }

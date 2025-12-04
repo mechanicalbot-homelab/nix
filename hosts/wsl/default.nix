@@ -26,7 +26,7 @@
 
   environment.shellAliases = {
     switch = "sudo nixos-rebuild switch";
-    deploy = "nix run github:serokell/deploy-rs";
+    deploy = "${pkgs.deploy-rs}/bin/deploy";
   };
 
   programs.nix-ld.enable = true;
