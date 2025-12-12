@@ -37,6 +37,7 @@ in
     btop
     gdu
     duf
+    iperf
   ];
 
   environment.shellAliases = {
