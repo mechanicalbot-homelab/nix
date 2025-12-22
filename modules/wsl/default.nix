@@ -18,9 +18,12 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    wsl.enable = true;
-    wsl.defaultUser = cfg.username;
-    wsl.interop.register = true;
+    wsl = {
+      enable = true;
+      defaultUser = cfg.username;
+      interop.register = true;
+      docker-desktop.enable = true;
+    };
 
     # vscode remote
     programs.nix-ld.enable = true;
