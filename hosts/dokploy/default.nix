@@ -32,6 +32,7 @@
     gdu
     duf
     lazydocker
+    git
   ];
 
   nix.settings.trusted-users = [ "@wheel" ];
