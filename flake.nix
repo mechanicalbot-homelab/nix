@@ -42,6 +42,17 @@
         ];
       };
 
+      nixosConfigurations.desktop = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = {
+          inherit inputs;
+        };
+        modules = [
+          disko.nixosModules.disko
+          ./hosts/desktop
+        ];
+      };
+
       nixosConfigurations.wsl = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
