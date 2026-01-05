@@ -30,19 +30,16 @@
   systemd.services.nvidia-resume.enable = true;
   systemd.services.nvidia-hibernate.enable = true;
 
-  programs.ssh.startAgent = true;
   programs.bash.interactiveShellInit = ''
     if [ -S "$HOME/.bitwarden-ssh-agent.sock" ]; then
       export SSH_AUTH_SOCK="$HOME/.bitwarden-ssh-agent.sock"
     fi
   '';
 
-  # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "desktop";
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   networking.networkmanager.enable = true;
 
@@ -64,23 +61,10 @@
     LC_TIME = "en_GB.UTF-8";
   };
 
-  # Enable the X11 windowing system.
-  # You can disable this if you're only using the Wayland session.
-  services.xserver.enable = true;
-
-  # Enable the KDE Plasma Desktop Environment.
-  services.displayManager.sddm.enable = true;
-  services.desktopManager.plasma6.enable = true;
   services.flatpak.enable = true;
-
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
-  };
-
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
+  services.displayManager.gdm.enable = true;
+  services.desktopManager.gnome.enable = true;
+  # services.desktopManager.cosmic.enable = true;
 
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
@@ -118,8 +102,6 @@
       "wheel"
     ];
     packages = with pkgs; [
-      kdePackages.kate
-      kdePackages.filelight
       code-cursor
       vscode
       brave
@@ -144,6 +126,14 @@
   environment.systemPackages = with pkgs; [
     git
     wget
-    kdePackages.discover
+    gnomeExtensions.appindicator
+    gnomeExtensions.just-perfection
+    gnomeExtensions.blur-my-shell
+    gnomeExtensions.dash-to-panel
+    gnomeExtensions.arc-menu
+    gnomeExtensions.paperwm
+    gnomeExtensions.user-themes
+    gnomeExtensions.clipboard-indicator
+    gnomeExtensions.vitals
   ];
 }
