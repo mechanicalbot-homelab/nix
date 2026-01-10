@@ -31,40 +31,54 @@
       wsl,
       ...
     }:
-    {
-      formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt-tree;
+    let
+      systems = [
+        "x86_64-linux"
+      ];
 
-      nixosConfigurations.dokploy = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          disko.nixosModules.disko
-          ./hosts/dokploy
-        ];
-      };
+      forAllSystems = nixpkgs.lib.genAttrs systems;
 
-      nixosConfigurations.desktop = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = {
-          inherit inputs;
+      mkNixos =
+        { name, modules }:
+        nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit inputs; };
+          modules = [
+            ({
+              nixpkgs.overlays = [
+                (final: _prev: {
+                  unstable = import inputs.nixpkgs-unstable {
+                    system = final.system;
+                    config.allowUnfree = true;
+                  };
+                })
+              ];
+            })
+            ./hosts/${name}
+          ]
+          ++ modules;
         };
+    in
+    {
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-tree);
+
+      nixosConfigurations.dokploy = mkNixos {
+        name = "dokploy";
         modules = [
           disko.nixosModules.disko
-          ./hosts/desktop
         ];
       };
 
-      nixosConfigurations.wsl = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
+      nixosConfigurations.desktop = mkNixos {
+        name = "desktop";
+        modules = [
+          disko.nixosModules.disko
+        ];
+      };
+
+      nixosConfigurations.wsl = mkNixos {
+        name = "wsl";
         modules = [
           wsl.nixosModules.default
-          ./hosts/wsl
-        ];
-      };
-
-      nixosConfigurations.lxc = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          ./hosts/lxc
         ];
       };
 
@@ -96,14 +110,6 @@
                 path = deployPkgs.deploy-rs.lib.activate.nixos self.nixosConfigurations.dokploy;
               };
             };
-            # lxc = {
-            #   hostname = "192.168.1.84";
-            #   sshUser = "root";
-            #   profiles.system = {
-            #     user = "root";
-            #     path = deployPkgs.deploy-rs.lib.activate.nixos self.nixosConfigurations.lxc;
-            #   };
-            # };
           };
         };
     };

@@ -101,7 +101,7 @@
       "networkmanager"
       "wheel"
     ];
-    packages = with pkgs; [
+    packages = with pkgs.unstable; [
       code-cursor
       vscode
       brave
@@ -112,13 +112,12 @@
       duf
       lazygit
       lazydocker
+      mise
     ];
   };
 
   programs.steam = {
     enable = true;
-    protontricks.enable = true;
-    gamescopeSession.enable = true;
   };
 
   nixpkgs.config.allowUnfree = true;
